@@ -4,11 +4,16 @@
 #
 # Created: Tue Dec 02 14:24:57 2014
 #      by: PyQt4 UI code generator 4.11.3
-#
+# Author: Han Liu 
+# Contact: hanangellove@icloud.com
 # WARNING! All changes made in this file will be lost!
 import os
+import re
+import string
 from xml.etree import ElementTree
 from PyQt4 import QtCore, QtGui
+
+LNBTS_ATTRIB_DIC = {'BtsId':0,'CellId':1,'version':'LNT4.0','ADJ_ENBC':0,'ADJ_OAMC':0,'ADJL':0,'ADJW':0,'REL':0,'RELW':0}
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -27,24 +32,31 @@ except AttributeError:
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName(_fromUtf8("Form"))
-        Form.resize(393, 449)
+        Form.setFixedSize(400, 470)
         font = QtGui.QFont()
         font.setPointSize(10)
         Form.setFont(font)
         Form.setAutoFillBackground(True)
 
         self.label_ADJWithEnbControll = QtGui.QLabel(Form)
-        self.label_ADJWithEnbControll.setGeometry(QtCore.QRect(80, 150, 131, 21))
+        self.label_ADJWithEnbControll.setGeometry(QtCore.QRect(80, 150, 111, 21))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label_ADJWithEnbControll.setFont(font)
         self.label_ADJWithEnbControll.setObjectName(_fromUtf8("label_ADJWithEnbControll"))
-        self.label_CellID = QtGui.QLabel(Form)
-        self.label_CellID.setGeometry(QtCore.QRect(20, 70, 171, 31))
+        self.label_ADJWithoamControll = QtGui.QLabel(Form)
+        self.label_ADJWithoamControll.setGeometry(QtCore.QRect(80, 120, 111, 21))
         font = QtGui.QFont()
         font.setPointSize(10)
-        self.label_CellID.setFont(font)
-        self.label_CellID.setObjectName(_fromUtf8("label_CellID"))
+        self.label_ADJWithoamControll.setFont(font)
+        self.label_ADJWithoamControll.setObjectName(_fromUtf8("label_ADJWithoamControll"))
+
+        self.label_SelectVersion = QtGui.QLabel(Form)
+        self.label_SelectVersion.setGeometry(QtCore.QRect(20, 70, 171, 31))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_SelectVersion.setFont(font)
+        self.label_SelectVersion.setObjectName(_fromUtf8("label_SelectVersion"))
         self.label_ADJ = QtGui.QLabel(Form)
         self.label_ADJ.setGeometry(QtCore.QRect(20, 120, 31, 51))
         font = QtGui.QFont()
@@ -58,7 +70,7 @@ class Ui_Form(object):
         self.label_ADJL.setFont(font)
         self.label_ADJL.setObjectName(_fromUtf8("label_ADJL"))
         self.label_ADJW = QtGui.QLabel(Form)
-        self.label_ADJW.setGeometry(QtCore.QRect(20, 210, 41, 21))
+        self.label_ADJW.setGeometry(QtCore.QRect(20, 210, 40, 21))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label_ADJW.setFont(font)
@@ -70,14 +82,21 @@ class Ui_Form(object):
         self.label_REL.setFont(font)
         self.label_REL.setObjectName(_fromUtf8("label_REL"))
         self.label_RELW = QtGui.QLabel(Form)
-        self.label_RELW.setGeometry(QtCore.QRect(20, 270, 31, 21))
+        self.label_RELW.setGeometry(QtCore.QRect(20, 270, 32, 21))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label_RELW.setFont(font)
         self.label_RELW.setObjectName(_fromUtf8("label_RELW"))
 
+        self.label_CellId = QtGui.QLabel(Form)
+        self.label_CellId.setGeometry(QtCore.QRect(20, 300, 31, 21))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.label_CellId.setFont(font)
+        self.label_CellId.setObjectName(_fromUtf8("label_CellId"))
+
         self.lineEdit_SourceFilePath = QtGui.QLineEdit(Form)
-        self.lineEdit_SourceFilePath.setGeometry(QtCore.QRect(20, 320, 211, 31))
+        self.lineEdit_SourceFilePath.setGeometry(QtCore.QRect(20, 345, 211, 21))
         self.lineEdit_SourceFilePath.setObjectName(_fromUtf8("lineEdit_SourceFilePath"))
         self.lineEdit_ADJWithEnbControll = QtGui.QLineEdit(Form)
         self.lineEdit_ADJWithEnbControll.setGeometry(QtCore.QRect(210, 150, 71, 21))
@@ -99,8 +118,13 @@ class Ui_Form(object):
         self.lineEdit_RELW.setGeometry(QtCore.QRect(80, 270, 71, 21))
         self.lineEdit_RELW.setObjectName(_fromUtf8("lineEdit_RELW"))
         self.lineEdit_TargetFilePath = QtGui.QLineEdit(Form)
-        self.lineEdit_TargetFilePath.setGeometry(QtCore.QRect(20, 370, 211, 31))
+        self.lineEdit_TargetFilePath.setGeometry(QtCore.QRect(20, 395, 211, 21))
         self.lineEdit_TargetFilePath.setObjectName(_fromUtf8("lineEdit_TargetFilePath"))
+        self.lineEdit_CellId = QtGui.QLineEdit(Form)
+        self.lineEdit_CellId.setGeometry(QtCore.QRect(80, 300, 71, 21))
+        self.lineEdit_CellId.setObjectName(_fromUtf8("lineEdit_CellId"))
+
+        
 
         self.label_Welcome = QtGui.QLabel(Form)
         self.label_Welcome.setGeometry(QtCore.QRect(70, 10, 241, 31))
@@ -117,45 +141,88 @@ class Ui_Form(object):
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
         self.comboBox.addItem(_fromUtf8(""))
-
-        self.label_ADJWithoamControll = QtGui.QLabel(Form)
-        self.label_ADJWithoamControll.setGeometry(QtCore.QRect(80, 120, 111, 21))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.label_ADJWithoamControll.setFont(font)
-        self.label_ADJWithoamControll.setObjectName(_fromUtf8("label_ADJWithoamControll"))
-        
+        self.comboBox.addItem(_fromUtf8(""))
+  
         self.pushButton_Exit = QtGui.QPushButton(Form)
-        self.pushButton_Exit.setGeometry(QtCore.QRect(250, 410, 121, 31))
+        self.pushButton_Exit.setGeometry(QtCore.QRect(250, 430, 121, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_Exit.setFont(font)
         self.pushButton_Exit.setObjectName(_fromUtf8("pushButton_Exit"))
 
         self.pushButton_CreatNewFile = QtGui.QPushButton(Form)
-        self.pushButton_CreatNewFile.setGeometry(QtCore.QRect(250, 370, 121, 31))
+        self.pushButton_CreatNewFile.setGeometry(QtCore.QRect(250, 390, 121, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_CreatNewFile.setFont(font)
         self.pushButton_CreatNewFile.setObjectName(_fromUtf8("pushButton_CreatNewSCF"))
 
         self.pushButton_SelectSourceSCF = QtGui.QPushButton(Form)
-        self.pushButton_SelectSourceSCF.setGeometry(QtCore.QRect(250, 320, 121, 31))
+        self.pushButton_SelectSourceSCF.setGeometry(QtCore.QRect(250, 340, 121, 31))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.pushButton_SelectSourceSCF.setFont(font)
         self.pushButton_SelectSourceSCF.setObjectName(_fromUtf8("pushButton_SelectSourceSCF"))
 
-        
-
         self.retranslateUi(Form)
+
+        self.lineEdit_CellId.textChanged.connect(self.onChangeed)
+        self.lineEdit_ADJWithEnbControll.textChanged.connect(self.onChangeed)
+        self.lineEdit_ADJWithOamControlled.textChanged.connect(self.onChangeed)
+        self.lineEdit_ADJL.textChanged.connect(self.onChangeed)
+        self.lineEdit_ADJW.textChanged.connect(self.onChangeed)
+        self.lineEdit_REL.textChanged.connect(self.onChangeed)
+        self.lineEdit_RELW.textChanged.connect(self.onChangeed)
+
         self.pushButton_SelectSourceSCF.clicked.connect(self.SelectSourceSCF)
         QtCore.QObject.connect(self.pushButton_Exit, QtCore.SIGNAL(_fromUtf8("clicked()")), Form.close)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
-    def SelectSourceSCF(self):
+    def onChangeed(self,text):
+
+        sender = self.sender()
+        senderName = str(sender.objectName())
+
+        try:
+            senderText = int(sender.text())
+        except ValueError, e:
+            if sender.text().isEmpty():
+                #judge if the input is empty, to avoid popup messageBox when lineEdit is cleared.
+                return 0
+            else:
+                QtGui.QMessageBox.question(self,'Message',"Here must be a number!")
+                sender.clear()
+                return 0
+        ###################
+        #print "sender.objectName is",str(sender.objectName()) 
+        #print "sender.text() is ",sender.text() , type(sender.text())
+        #print "senderText is:", senderText,type(senderText)
+        ####################
+        #convert QString u'123' to int 123.
+        #print text, type(text)
+        #string = unicode(text)      
+        #senderText = int(string)
+        ####################
+
+        if senderName == "lineEdit_CellId":
+            LNBTS_ATTRIB_DIC['CellId'] = senderText
+        elif senderName == "lineEdit_ADJWithOamControlled":
+            LNBTS_ATTRIB_DIC['ADJ_OAMC'] = senderText
+        elif senderName == "lineEdit_ADJWithEnbControll":
+            LNBTS_ATTRIB_DIC['ADJ_ENBC'] = senderText
+        elif senderName == "lineEdit_ADJL":
+            LNBTS_ATTRIB_DIC['ADJL'] = senderText
+        elif senderName == "lineEdit_ADJW":
+            LNBTS_ATTRIB_DIC['ADJW'] = senderText
+        elif senderName == "lineEdit_REL":
+            LNBTS_ATTRIB_DIC['REL'] = senderText
+        elif senderName == "lineEdit_RELW":
+            LNBTS_ATTRIB_DIC['RELW'] = senderText
+
+        #print  LNBTS_ATTRIB_DIC
+
+    def SelectSourceSCF(self):        
         options = QtGui.QFileDialog.DontUseNativeDialog
-        print options
 
         filename = QtGui.QFileDialog.getOpenFileName(self,"file",self.lineEdit_SourceFilePath.text(),
             "Text Files (*.xml);;All Files (*)")
@@ -163,19 +230,40 @@ class Ui_Form(object):
         if filename:
             self.lineEdit_SourceFilePath.setText(filename)
             oFile = os.path.splitext(str(filename))
-            eleTree = ElementTree.fromstring(filename)
+            print oFile
             if ".xml" == oFile[1]:
                 fh = open(filename,'a+')
-                cstr = fh.read()#Need to add functions that parse xml File. 
+                filestring = fh.read()
+                # add functions that parse xml File. 
+                BtsId_list =  self.parsexml(filestring)
+     
+                print ""
+                print "--------------------------------" 
+                print "BtsId is :" , BtsId_list[0]                                                               
+                print "LNBTS_ATTRIB_DIC is:", LNBTS_ATTRIB_DIC
 
-                if 'btsId' in cstr:
-                    print "Find btsId!";
-                    node_child = eleTree.Find('btsId')
-                    print node_child
                 fh.close()
 
-
-        
+    def parsexml(slef,string):
+        xmlstr = string
+        rootEleTree = ElementTree.fromstring(xmlstr)
+        print rootEleTree.tag, rootEleTree.attrib
+        print "================================="
+        if 'btsId' in xmlstr:
+            print "Find btsId!";
+            for childTree in rootEleTree:
+                print childTree.tag , childTree.attrib
+                for grandsonTree in childTree:
+                    #print grandsonTree.tag, grandsonTree.attrib
+                    for key in grandsonTree.attrib:
+                        if key=='class' and grandsonTree.attrib[key]=='LNBTS':  
+                            print str(grandsonTree)                                  
+                            print  grandsonTree.attrib
+                            LNBTS_ATTRIB_DIC['version'] = grandsonTree.attrib['version']
+                            BtsId_list = re.findall(r'[\d\.]+',grandsonTree.attrib['distName'])
+                            LNBTS_ATTRIB_DIC['BtsId'] = BtsId_list[0]
+                            #print BtsId_list[0]
+                            return BtsId_list 
 
 
     def retranslateUi(self, Form):
@@ -185,7 +273,7 @@ class Ui_Form(object):
         self.pushButton_SelectSourceSCF.setText(_translate("Form", "Select Source SCF", None))
 
         self.label_ADJWithEnbControll.setText(_translate("Form", "enbControlled", None))
-        self.label_CellID.setText(_translate("Form", "Please select the SCF version", None))
+        self.label_SelectVersion.setText(_translate("Form", "Please select the SCF version", None))
         self.label_ADJ.setToolTip(_translate("Form", "Default is oamControll", None))
         self.label_ADJ.setText(_translate("Form", "ADJ", None))
         self.label_ADJL.setToolTip(_translate("Form", "ADJL Amount Per LNADJ", None))
@@ -195,10 +283,15 @@ class Ui_Form(object):
         self.label_RELW.setText(_translate("Form", "RELW", None))
         self.label_Welcome.setText(_translate("Form", "Welcome use SCF Generator", None))
         self.label_ADJWithoamControll.setText(_translate("Form", "oamControlled", None))
-
-        self.comboBox.setItemText(0, _translate("Form", "LNT4.0", None))
-        self.comboBox.setItemText(1, _translate("Form", "LNT5.0", None))
-        self.comboBox.setItemText(2, _translate("Form", "TL15A", None))
+        self.label_CellId.setText(_translate("Form", "CellId", None))
+        
+        ###################
+        #comboBox has 4 senderTexts.Default is None.If you choose another senderTexts like lNT5.0, then it will be effective during creat new SCF files.
+        ###################
+        self.comboBox.setItemText(0, _translate("Form", "", None))
+        self.comboBox.setItemText(1, _translate("Form", "LNT4.0", None))
+        self.comboBox.setItemText(2, _translate("Form", "LNT5.0", None))
+        self.comboBox.setItemText(3, _translate("Form", "TL15A", None))
 
         
         
